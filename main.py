@@ -28,6 +28,7 @@ def test_zip(archive_name):
     zf = zipfile.ZipFile(archive_name)
     res = zf.testzip()
     if res:
+        print(res)
         raise Exception('check error {}'.format(archive_name))
 
 
@@ -45,6 +46,15 @@ def print_zip_info(archive_name):
 
 def zip_all_paths(dir_list, path_to_save='', file_name='zipfile_write.zip'):
     zip_path = path_to_save + file_name
+
+    # check existing file
+    res = os.path.exists(zip_path)
+    if res:
+        print("File exist, (1) to rewrite, (0) exit(2): ")
+        inp = int(input())
+        if inp != 1:
+            exit(2)
+
     print('Creating archive')
     if path_to_save:
         if not (path_to_save.endswith('/') or path_to_save.endswith('\\')):
