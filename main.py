@@ -50,20 +50,20 @@ def zip_all_paths(dir_list, path_to_save='', file_name='zipfile_write.zip'):
     print("IS total files - ", files_count)
     try:
         for el in dir_list:
-            print('\rAdding to archive\t{}'.format(el))
             if os.path.isdir(el):
                 for folder, subfolders, files in os.walk(el):
                     for file in files:
-                        print('\rAdding to archive\t{}'.format(folder+"\\"+file))
                         zf.write(os.path.join(folder, file),
                                  os.path.relpath(os.path.join(folder, file), el),
                                  compress_type=zipfile.ZIP_DEFLATED)
+                        files_count -= 1
+                        print("\rОсталось файлов - {};\t".format(files_count), end='')
+                        print('Adding to archive\t{}'.format(folder+"\\"+file), end='')
             else:
                 zf.write(el)
     finally:
         print('Archive closing {}'.format(zip_path))
         zf.close()
-    print_zip_info(zip_path)
 
 
 def get_files_cnt(path):
@@ -71,9 +71,16 @@ def get_files_cnt(path):
     :param path: Папка в которой нужно посчитать число файлов
     :return: File count
     """
-    if os.path.isdir(path):
-        return 0
-    return 0
+    cnt = 0
+    if not os.path.isdir(path):
+        cnt += 1
+    else:
+        for i in os.listdir(path):
+            if os.path.isdir(path+'/'+i):
+                cnt += get_files_cnt(path+'/'+i)
+            else:
+                cnt += 1
+    return cnt
 
 
 def run_bat(path, file_name):
@@ -92,4 +99,3 @@ if __name__ == '__main__':
     # run_bat("E:/", "test.bat")
     lst = get_dir_list()
     zip_all_paths(dir_list=lst)
-    print(lst)
