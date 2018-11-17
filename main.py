@@ -24,6 +24,13 @@ def get_dir_list():
     return dir_list
 
 
+def test_zip(archive_name):
+    zf = zipfile.ZipFile(archive_name)
+    res = zf.testzip()
+    if res:
+        raise Exception('check error {}'.format(archive_name))
+
+
 def print_zip_info(archive_name):
     zf = zipfile.ZipFile(archive_name)
     for info in zf.infolist():
@@ -43,11 +50,14 @@ def zip_all_paths(dir_list, path_to_save='', file_name='zipfile_write.zip'):
         if not (path_to_save.endswith('/') or path_to_save.endswith('\\')):
             path_to_save += '/'
     zf = zipfile.ZipFile(zip_path, mode='w')
+
     print("Getting file count")
     files_count = 0
     for el in dir_list:
         files_count += get_files_cnt(el)
     print("IS total files - ", files_count)
+
+    # adding files to archive
     try:
         for el in dir_list:
             if os.path.isdir(el):
@@ -64,6 +74,7 @@ def zip_all_paths(dir_list, path_to_save='', file_name='zipfile_write.zip'):
     finally:
         print('Archive closing {}'.format(zip_path))
         zf.close()
+    test_zip(zip_path)
 
 
 def get_files_cnt(path):
@@ -77,6 +88,7 @@ def get_files_cnt(path):
     else:
         for i in os.listdir(path):
             if os.path.isdir(path+'/'+i):
+                # recursive
                 cnt += get_files_cnt(path+'/'+i)
             else:
                 cnt += 1
